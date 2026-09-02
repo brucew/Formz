@@ -185,7 +185,7 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
          params: { submission: { values: { fields(:team).id.to_s => "Design" } } }
 
     assert_response :unprocessable_content
-    error_id = "submission_values_#{@full_name.id}_error"
+    error_id = "answer-#{@full_name.id}-error"
     assert_select "input[name=?][aria-invalid=true][aria-describedby=?]",
                   "submission[values][#{@full_name.id}]", error_id
     assert_select "##{error_id}", text: /#{@full_name.label} is required/
@@ -210,11 +210,31 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     } } }
 
     assert_response :unprocessable_content
-    error_id = "submission_values_#{fields(:perks).id}_error"
+    error_id = "answer-#{fields(:perks).id}-error"
     assert_select "input[type=checkbox][name=?][aria-describedby=?]",
                   "submission[values][#{fields(:perks).id}][]", error_id, count: 2
     assert_select "fieldset[aria-invalid=true]", 1
     assert_select "##{error_id}", text: /not one of its choices/
+  end
+
+  # A choice's own control id comes from its downcased value, so a choice named "Error"
+  # once took the same id as the field's error container and made aria-describedby
+  # ambiguous — pointing the error message at a check box instead of at itself.
+  test "a choice named like an id suffix does not collide with the error container" do
+    form = users(:admin).forms.create!(
+      name: "Collision",
+      fields_attributes: [ { label: "Pick", input_type: "check_box", value_type: "string",
+                             required: true, choices: [ "Error", "Hint" ] } ]
+    )
+    field = form.fields.sole
+
+    sign_in_as users(:member)
+    post form_submission_path(form), params: { submission: { values: { field.id.to_s => [ "" ] } } }
+
+    assert_response :unprocessable_content
+    assert_select "##{"answer-#{field.id}-error"}", count: 1, text: /Pick is required/
+    assert_select "input[type=checkbox][value=Error]", count: 1
+    assert_select "input[type=checkbox][value=Error][id=?]", "answer-#{field.id}-error", count: 0
   end
 
   test "the required marker is spelled out for screen readers" do

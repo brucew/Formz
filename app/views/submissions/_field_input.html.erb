@@ -4,8 +4,11 @@
 <% answer = submission.values[field.id.to_s] %>
 <% errors = answer_errors_for(submission, field) %>
 <% control_class = errors.any? ? "form-control ring-red-400" : "form-control" %>
-<% hint_id = value_form.field_id(field.id, :hint) if field.description.present? %>
-<% error_id = value_form.field_id(field.id, :error) if errors.any? %>
+<%# Hyphens, because a choice's own control id comes from downcasing its value and
+    replacing every non-word character with an underscore — so a choice named "Error"
+    would otherwise take the same id as this field's error container. %>
+<% hint_id = "answer-#{field.id}-hint" if field.description.present? %>
+<% error_id = "answer-#{field.id}-error" if errors.any? %>
 <% described_by = [ hint_id, error_id ].compact.join(" ").presence %>
 
 <div class="mb-6">

@@ -49,12 +49,12 @@
 <% elsif current_user.admin? %>
   <%= render layout: "shared/empty_state",
         locals: { title: "No forms yet",
-                  description: "No one has created a form yet. Build the first one." } do %>
+                  description: "No forms are open to you right now. Build the first one." } do %>
     <%= link_to "My forms", admin_forms_path, class: "btn btn-secondary" %>
     <%= link_to "New form", new_admin_form_path, class: "btn btn-primary" %>
   <% end %>
 <% else %>
   <%= render "shared/empty_state",
         title: "No forms yet",
-        description: "When an administrator creates a form it will show up here." %>
+        description: "No forms are open to you right now. When an administrator opens one, it will show up here." %>
 <% end %>
