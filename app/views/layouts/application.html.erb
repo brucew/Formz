@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-full bg-slate-50">
+<html lang="en" class="h-full bg-slate-50">
   <head>
     <title><%= content_for(:title) || "Formz" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -20,6 +20,11 @@
   </head>
 
   <body class="h-full text-slate-900 antialiased">
+    <a href="#main"
+       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-10 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-indigo-700 focus:ring-2 focus:ring-indigo-600">
+      Skip to content
+    </a>
+
     <% if user_signed_in? %>
       <header class="border-b border-slate-200 bg-white">
         <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4 sm:px-6">
@@ -43,7 +48,7 @@
       </header>
     <% end %>
 
-    <main class="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <main id="main" class="mx-auto max-w-5xl px-4 py-10 sm:px-6">
       <%= render "shared/flash" %>
       <%= yield %>
     </main>
