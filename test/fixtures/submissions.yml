@@ -1,0 +1,5 @@
+member_locked_form:
+  form: locked_form
+  user: member
+  values:
+    <%= ActiveRecord::FixtureSet.identify(:locked_note) %>: Already answered

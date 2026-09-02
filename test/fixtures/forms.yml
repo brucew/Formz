@@ -1,0 +1,20 @@
+survey:
+  owner: admin
+  name: Team survey
+  description: Tell us how the quarter went
+  active: true
+
+locked_form:
+  owner: admin
+  name: Locked form
+  active: true
+
+deleted_form:
+  owner: admin
+  name: Deleted form
+  active: false
+
+other_admins_form:
+  owner: other_admin
+  name: Someone elses form
+  active: true
