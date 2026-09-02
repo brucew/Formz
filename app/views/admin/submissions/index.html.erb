@@ -1,0 +1,49 @@
+<% content_for :title, "#{@form.name} submissions" %>
+
+<%= render layout: "shared/page_header", locals: {
+      title: "#{@form.name} submissions",
+      description: "Everything people have answered on this form."
+    } do %>
+  <%= link_to "Back to form", admin_form_path(@form), class: "btn btn-secondary" %>
+  <% if @submissions.any? %>
+    <%= link_to "Download CSV", admin_form_submissions_path(@form, format: :csv),
+                class: "btn btn-primary" %>
+  <% end %>
+<% end %>
+
+<% if @form.deleted? %>
+  <p class="mb-6 rounded-md bg-slate-100 px-4 py-3 text-sm text-slate-700 ring-1 ring-inset ring-slate-300" role="status">
+    <span class="badge badge-deleted">Deleted</span>
+    This form is deleted, so it is no longer collecting answers. The submissions below are
+    kept and can still be exported.
+  </p>
+<% end %>
+
+<% if @submissions.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="data-table">
+        <thead class="bg-slate-50">
+          <tr>
+            <th scope="col">Submitted by</th>
+            <th scope="col">Submitted at</th>
+            <% @form.fields.each do |field| %>
+              <th scope="col"><%= field.label %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          <%= render partial: "submission", collection: @submissions,
+                     locals: { fields: @form.fields } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <%= render layout: "shared/empty_state", locals: {
+        title: "No submissions yet",
+        description: "Nobody has filled this form out. Answers will show up here as they arrive."
+      } do %>
+    <%= link_to "Back to form", admin_form_path(@form), class: "btn btn-secondary" %>
+  <% end %>
+<% end %>
