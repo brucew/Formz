@@ -38,14 +38,118 @@ class Admin::FormsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", edit_admin_form_path(forms(:survey))
   end
 
+  test "the index offers the action that starts a new form" do
+    sign_in_as(users(:admin))
+
+    get admin_forms_path
+
+    assert_select "a[href=?]", new_admin_form_path, text: "New form"
+  end
+
+  # The table is only rendered at desktop widths and the cards only below them, so both
+  # presentations have to carry every form or one width silently loses rows.
+  test "the index renders every form as a table row and as a stacked card" do
+    sign_in_as(users(:admin))
+
+    get admin_forms_path
+
+    owned_forms = users(:admin).forms.count
+
+    assert_select "table tbody tr", count: owned_forms
+    assert_select "li.card", count: owned_forms
+  end
+
+  test "an active form on the index offers view, edit, submissions and delete" do
+    sign_in_as(users(:admin))
+    survey = forms(:survey)
+
+    get admin_forms_path
+
+    assert_select "a[href=?]", admin_form_path(survey), text: "View"
+    assert_select "a[href=?]", edit_admin_form_path(survey), text: "Edit"
+    assert_select "a[href=?]", admin_form_submissions_path(survey), text: "Submissions"
+    assert_select "form[action=?] button", admin_form_path(survey), text: "Delete"
+  end
+
+  test "a deleted form on the index is badged and offers neither edit nor delete" do
+    sign_in_as(users(:admin))
+    deleted = forms(:deleted_form)
+
+    get admin_forms_path
+
+    assert_select ".badge-deleted", text: "Deleted"
+    assert_select ".badge-admin", text: "Active"
+    assert_select "a[href=?]", admin_form_path(deleted), text: "View"
+    assert_select "a[href=?]", admin_form_submissions_path(deleted), text: "Submissions"
+    assert_select "a[href=?]", edit_admin_form_path(deleted), count: 0
+    assert_select "form[action=?]", admin_form_path(deleted), count: 0
+  end
+
+  # The labels repeat once per form, so out of context each one has to say which form it
+  # belongs to.
+  test "the repeated row actions name the form they act on" do
+    sign_in_as(users(:admin))
+
+    get admin_forms_path
+
+    assert_select "a[aria-label=?]", "Edit #{forms(:survey).name}"
+    assert_select "button[aria-label=?]", "Delete #{forms(:survey).name}"
+  end
+
+  test "an admin with no forms gets the empty state and a way out of it" do
+    sign_in_as(admin_without_forms)
+
+    get admin_forms_path
+
+    assert_response :success
+    assert_select "table", count: 0
+    assert_select "h2", text: "No forms yet"
+    assert_select "a[href=?]", new_admin_form_path, text: "New form"
+  end
+
+  test "every admin form page has exactly one top level heading" do
+    sign_in_as(users(:admin))
+
+    [ admin_forms_path, new_admin_form_path, admin_form_path(forms(:survey)),
+      edit_admin_form_path(forms(:survey)) ].each do |path|
+      get path
+
+      assert_select "h1", count: 1, message: "expected one h1 on #{path}"
+    end
+  end
+
   test "the show page lists the fields of an owned form" do
     sign_in_as(users(:admin))
 
     get admin_form_path(forms(:survey))
 
     assert_response :success
+    assert_select "h2", text: "Fields"
     assert_select "h3", text: /Full name/
     assert_select "h3", text: /Team/
+  end
+
+  test "the show page of a locked form explains that its fields are fixed" do
+    sign_in_as(users(:admin))
+
+    get admin_form_path(forms(:locked_form))
+
+    assert_response :success
+    assert_select "[role=status]", text: /answered this\s+form, so its fields are fixed/
+    assert_select "a[href=?]", edit_admin_form_path(forms(:locked_form)), text: "Edit"
+  end
+
+  test "the show page of a deleted form explains the state and drops the edit action" do
+    sign_in_as(users(:admin))
+    deleted = forms(:deleted_form)
+
+    get admin_form_path(deleted)
+
+    assert_response :success
+    assert_select "[role=status] .badge-deleted", text: "Deleted"
+    assert_select "[role=status]", text: /This form is deleted/
+    assert_select "a[href=?]", edit_admin_form_path(deleted), count: 0
+    assert_select "form[action=?]", admin_form_path(deleted), count: 0
   end
 
   # The lookup runs through current_user.forms, so another admin's form is missing from
@@ -232,4 +336,12 @@ class Admin::FormsControllerTest < ActionDispatch::IntegrationTest
     assert_not survey.reload.active?
     assert survey.deleted?
   end
+
+  private
+
+    # Every form fixture belongs to an existing admin, so the empty state needs an admin
+    # of its own.
+    def admin_without_forms
+      User.create!(email: "new_admin@example.com", password: "password123", admin: true)
+    end
 end

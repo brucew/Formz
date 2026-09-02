@@ -8,7 +8,9 @@
 <% end %>
 
 <% if @forms.any? %>
-  <div class="card overflow-hidden">
+  <%# The table is the right shape once there is room for five columns; below that the
+      same rows are stacked as cards so nothing is pushed off the side of the page. %>
+  <div class="card hidden overflow-hidden lg:block">
     <div class="overflow-x-auto">
       <table class="data-table">
         <thead class="bg-slate-50">
@@ -26,6 +28,10 @@
       </table>
     </div>
   </div>
+
+  <ul class="space-y-4 lg:hidden">
+    <%= render partial: "form_card", collection: @forms, as: :form %>
+  </ul>
 <% else %>
   <%= render layout: "shared/empty_state", locals: {
         title: "No forms yet",

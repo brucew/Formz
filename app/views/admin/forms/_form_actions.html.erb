@@ -1,0 +1,22 @@
+<%# Everything you can do to one form from the list, shared by the table row and the
+    stacked card so both widths offer the same actions in the same order. Every action
+    wears the same button geometry so the cluster reads as one group; only Delete is
+    coloured differently. The accessible name carries the form name because these labels
+    repeat once per row. %>
+<%= link_to "View", admin_form_path(form), class: "btn btn-secondary",
+            aria: { label: "View #{form.name}" } %>
+
+<% unless form.deleted? %>
+  <%= link_to "Edit", edit_admin_form_path(form), class: "btn btn-secondary",
+              aria: { label: "Edit #{form.name}" } %>
+<% end %>
+
+<%= link_to "Submissions", admin_form_submissions_path(form), class: "btn btn-secondary",
+            aria: { label: "Submissions for #{form.name}" } %>
+
+<% unless form.deleted? %>
+  <%= button_to "Delete", admin_form_path(form), method: :delete,
+                class: "btn btn-danger", form_class: "contents",
+                aria: { label: "Delete #{form.name}" },
+                data: { turbo_confirm: "Delete #{form.name}? Members will no longer see it, and the #{pluralize(form.submissions.size, 'submission')} already collected are kept." } %>
+<% end %>

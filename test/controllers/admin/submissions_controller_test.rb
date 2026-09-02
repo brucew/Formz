@@ -39,6 +39,40 @@ class Admin::SubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: "Already answered"
   end
 
+  test "the index offers the csv download and a way back to the form" do
+    sign_in_as(users(:admin))
+    locked = forms(:locked_form)
+
+    get admin_form_submissions_path(locked)
+
+    assert_select "a[href=?]", admin_form_submissions_path(locked, format: :csv),
+                  text: "Download CSV"
+    assert_select "a[href=?]", admin_form_path(locked), text: "Back to form"
+  end
+
+  # The table is one column per field, so it is wide on purpose and scrolls inside its
+  # own card. That scrolling has to be reachable without a mouse.
+  test "the wide submissions table is a named region a keyboard can reach" do
+    sign_in_as(users(:admin))
+
+    get admin_form_submissions_path(forms(:locked_form))
+
+    assert_select "[role=region][tabindex=?]", "0" do
+      assert_select "table"
+    end
+    assert_select "[role=region][aria-label=?]", "Locked form submissions"
+  end
+
+  test "an unanswered field is spelled out rather than left as a dash alone" do
+    sign_in_as(users(:admin))
+    Submission.create!(form: forms(:survey), user: users(:another_member),
+                       values: { fields(:full_name).id.to_s => "Nobody" })
+
+    get admin_form_submissions_path(forms(:survey))
+
+    assert_select "td span.sr-only", text: "No answer"
+  end
+
   test "the csv export carries the header row and every answer" do
     sign_in_as(users(:admin))
 
@@ -89,6 +123,9 @@ class Admin::SubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h2", text: "No submissions yet"
     assert_select "table", count: 0
+    assert_select "a[href=?]", admin_form_submissions_path(forms(:survey), format: :csv),
+                  count: 0
+    assert_select "a[href=?]", admin_form_path(forms(:survey)), text: "Back to form"
   end
 
   private

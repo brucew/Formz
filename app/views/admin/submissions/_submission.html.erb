@@ -2,6 +2,14 @@
   <td class="font-medium whitespace-nowrap text-slate-900"><%= submission.user.email %></td>
   <td class="whitespace-nowrap"><%= l(submission.created_at, format: :long) %></td>
   <% fields.each do |field| %>
-    <td><%= submission.display_value_for(field).presence || "—" %></td>
+    <td>
+      <% answer = submission.display_value_for(field) %>
+      <% if answer.present? %>
+        <%= answer %>
+      <% else %>
+        <span class="text-slate-400" aria-hidden="true">—</span>
+        <span class="sr-only">No answer</span>
+      <% end %>
+    </td>
   <% end %>
 </tr>

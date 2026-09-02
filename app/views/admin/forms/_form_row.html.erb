@@ -1,32 +1,20 @@
-<%# One row of the admin form list. A deleted form is de-emphasised and loses its edit link. %>
-<tr class="<%= "bg-slate-50 opacity-75" if form.deleted? %>">
+<%# One row of the wide-screen form table. A deleted form is de-emphasised with a tinted
+    row and loses its edit and delete actions; the "Deleted" badge is what actually says
+    so, since colour on its own says nothing. %>
+<tr class="<%= "bg-slate-50" if form.deleted? %>">
   <td>
-    <%= link_to form.name, admin_form_path(form), class: "font-medium text-indigo-600 hover:text-indigo-500" %>
+    <%= link_to form.name, admin_form_path(form),
+                class: "font-medium break-words text-indigo-600 hover:text-indigo-500 focus-visible:underline" %>
     <% if form.description.present? %>
       <p class="mt-1 max-w-md text-slate-500"><%= truncate(form.description, length: 90) %></p>
     <% end %>
   </td>
   <td class="whitespace-nowrap"><%= form.fields.size %></td>
   <td class="whitespace-nowrap"><%= form.submissions.size %></td>
-  <td class="whitespace-nowrap">
-    <% if form.deleted? %>
-      <span class="badge badge-deleted">Deleted</span>
-    <% else %>
-      <span class="badge badge-admin">Active</span>
-    <% end %>
-  </td>
+  <td class="whitespace-nowrap"><%= render "form_status", form: form %></td>
   <td>
-    <div class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
-      <%= link_to "View", admin_form_path(form), class: "btn-link" %>
-      <% unless form.deleted? %>
-        <%= link_to "Edit", edit_admin_form_path(form), class: "btn-link" %>
-      <% end %>
-      <%= link_to "Submissions", admin_form_submissions_path(form), class: "btn-link" %>
-      <% unless form.deleted? %>
-        <%= button_to "Delete", admin_form_path(form), method: :delete,
-                      class: "btn btn-danger", form_class: "inline-block",
-                      data: { turbo_confirm: "Delete #{form.name}? Members will no longer see it, and the #{pluralize(form.submissions.size, 'submission')} already collected are kept." } %>
-      <% end %>
+    <div class="flex flex-wrap items-center justify-end gap-2">
+      <%= render "form_actions", form: form %>
     </div>
   </td>
 </tr>

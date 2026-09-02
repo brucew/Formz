@@ -1,0 +1,25 @@
+<%# One form as a stacked card, for widths where the table would force the page to
+    scroll sideways. Same information and the same actions as the table row. %>
+<li class="card p-5 <%= "bg-slate-50" if form.deleted? %>">
+  <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+    <h2 class="min-w-0 break-words text-base font-semibold text-slate-900">
+      <%= link_to form.name, admin_form_path(form),
+                  class: "hover:text-indigo-600 focus-visible:underline" %>
+    </h2>
+
+    <%= render "form_status", form: form %>
+  </div>
+
+  <% if form.description.present? %>
+    <p class="mt-1 prose-muted"><%= truncate(form.description, length: 120) %></p>
+  <% end %>
+
+  <p class="mt-2 text-xs text-slate-500">
+    <%= pluralize(form.fields.size, "field") %> ·
+    <%= pluralize(form.submissions.size, "submission") %>
+  </p>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2">
+    <%= render "form_actions", form: form %>
+  </div>
+</li>

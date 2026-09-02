@@ -20,8 +20,11 @@
 <% end %>
 
 <% if @submissions.any? %>
+  <%# One column per field, so this table is wide on purpose and scrolls inside its own
+      card. tabindex makes that scrolling reachable without a mouse. %>
   <div class="card overflow-hidden">
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500"
+         role="region" aria-label="<%= @form.name %> submissions" tabindex="0">
       <table class="data-table">
         <thead class="bg-slate-50">
           <tr>

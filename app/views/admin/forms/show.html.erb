@@ -8,7 +8,7 @@
   <% unless @form.deleted? %>
     <%= link_to "Edit", edit_admin_form_path(@form), class: "btn btn-primary" %>
     <%= button_to "Delete", admin_form_path(@form), method: :delete,
-                  class: "btn btn-danger", form_class: "inline-block",
+                  class: "btn btn-danger", form_class: "contents",
                   data: { turbo_confirm: "Delete #{@form.name}? Members will no longer see it, and the #{pluralize(@form.submissions.size, 'submission')} already collected are kept." } %>
   <% end %>
 <% end %>
@@ -27,9 +27,12 @@
 <% end %>
 
 <div class="card divide-y divide-slate-200">
-  <div class="flex flex-wrap gap-x-8 gap-y-2 px-6 py-4 prose-muted">
-    <span><%= pluralize(@form.fields.size, "field") %></span>
-    <span><%= pluralize(@form.submissions.size, "submission") %></span>
+  <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-6 py-4">
+    <h2 class="text-base font-semibold text-slate-900">Fields</h2>
+    <p class="prose-muted">
+      <%= pluralize(@form.fields.size, "field") %> ·
+      <%= pluralize(@form.submissions.size, "submission") %>
+    </p>
   </div>
 
   <% if @form.fields.any? %>
