@@ -1,0 +1,10 @@
+<% content_for :title, "New form" %>
+
+<%= render layout: "shared/page_header", locals: {
+      title: "New form",
+      description: "Name the form, then add the questions people will answer."
+    } do %>
+  <%= link_to "Back to forms", admin_forms_path, class: "btn btn-secondary" %>
+<% end %>
+
+<%= render "form", form: @form %>

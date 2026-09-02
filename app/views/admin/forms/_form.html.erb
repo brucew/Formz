@@ -1,0 +1,74 @@
+<%# The form editor. Pass the Form record as `form`. %>
+<%= form_with model: [ :admin, form ], class: "space-y-6" do |form_builder| %>
+  <%= render "shared/error_messages", record: form %>
+
+  <div class="card space-y-5 p-6">
+    <div>
+      <%= form_builder.label :name, "Name", class: "form-label" %>
+      <%= form_builder.text_field :name, class: "form-control", required: true,
+                                  placeholder: "Team survey" %>
+    </div>
+
+    <div>
+      <%= form_builder.label :description, "Description", class: "form-label" %>
+      <%= form_builder.text_area :description, rows: 3, class: "form-control" %>
+      <p class="form-hint">Optional. Shown to members above the questions.</p>
+    </div>
+  </div>
+
+  <% if form.locked? %>
+    <div class="card space-y-4 p-6">
+      <div>
+        <h2 class="text-base font-semibold text-slate-900">Fields</h2>
+        <p class="form-hint">
+          <%= pluralize(form.submissions.size, "person has", plural: "people have") %> already
+          answered this form, so its fields are fixed — changing them would leave those answers
+          describing questions that no longer exist. The name and description above are still
+          yours to change.
+        </p>
+      </div>
+
+      <ol class="divide-y divide-slate-200 rounded-md ring-1 ring-slate-200">
+        <% form.fields.each_with_index do |field, index| %>
+          <li class="px-4 py-4">
+            <%= render "field_summary", field: field, number: index + 1 %>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  <% else %>
+    <div class="card space-y-4 p-6" data-controller="nested-fields">
+      <div>
+        <h2 class="text-base font-semibold text-slate-900">Fields</h2>
+        <p class="form-hint">
+          Questions are asked in the order they appear here. Number fields store numbers and
+          date fields store dates; every other input type stores text.
+        </p>
+      </div>
+
+      <div class="space-y-4" data-nested-fields-target="rows">
+        <%= form_builder.fields_for :fields do |field_builder| %>
+          <%= render "field_fields", field_builder: field_builder %>
+        <% end %>
+      </div>
+
+      <template data-nested-fields-target="template">
+        <%= form_builder.fields_for :fields, template_field, child_index: "NEW_RECORD" do |field_builder| %>
+          <%= render "field_fields", field_builder: field_builder %>
+        <% end %>
+      </template>
+
+      <div>
+        <button type="button" class="btn btn-secondary" data-action="nested-fields#add">
+          Add field
+        </button>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <%= form_builder.submit form.new_record? ? "Create form" : "Save changes", class: "btn btn-primary" %>
+    <%= link_to "Cancel", form.persisted? ? admin_form_path(form) : admin_forms_path,
+                class: "btn btn-secondary" %>
+  </div>
+<% end %>

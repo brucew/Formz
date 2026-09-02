@@ -1,0 +1,48 @@
+<% content_for :title, @form.name %>
+
+<%= render layout: "shared/page_header", locals: {
+      title: @form.name,
+      description: @form.description
+    } do %>
+  <%= link_to "Submissions", admin_form_submissions_path(@form), class: "btn btn-secondary" %>
+  <% unless @form.deleted? %>
+    <%= link_to "Edit", edit_admin_form_path(@form), class: "btn btn-primary" %>
+    <%= button_to "Delete", admin_form_path(@form), method: :delete,
+                  class: "btn btn-danger", form_class: "inline-block",
+                  data: { turbo_confirm: "Delete #{@form.name}? Members will no longer see it, and the #{pluralize(@form.submissions.size, 'submission')} already collected are kept." } %>
+  <% end %>
+<% end %>
+
+<% if @form.deleted? %>
+  <p class="mb-6 rounded-md bg-slate-100 px-4 py-3 text-sm text-slate-700 ring-1 ring-inset ring-slate-300" role="status">
+    <span class="badge badge-deleted">Deleted</span>
+    This form is deleted. Members can no longer see or fill it out and it can no longer be
+    edited. Everything already submitted is kept and can still be exported.
+  </p>
+<% elsif @form.locked? %>
+  <p class="mb-6 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-inset ring-amber-200" role="status">
+    <%= pluralize(@form.submissions.size, "person has", plural: "people have") %> answered this
+    form, so its fields are fixed. The name and description can still be changed.
+  </p>
+<% end %>
+
+<div class="card divide-y divide-slate-200">
+  <div class="flex flex-wrap gap-x-8 gap-y-2 px-6 py-4 prose-muted">
+    <span><%= pluralize(@form.fields.size, "field") %></span>
+    <span><%= pluralize(@form.submissions.size, "submission") %></span>
+  </div>
+
+  <% if @form.fields.any? %>
+    <ol class="divide-y divide-slate-200">
+      <% @form.fields.each_with_index do |field, index| %>
+        <li class="px-6 py-5">
+          <%= render "field_summary", field: field, number: index + 1 %>
+        </li>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="px-6 py-8 text-center prose-muted">
+      This form has no fields yet, so there is nothing to answer.
+    </p>
+  <% end %>
+</div>

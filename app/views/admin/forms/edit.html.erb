@@ -1,0 +1,10 @@
+<% content_for :title, "Edit #{@form.name}" %>
+
+<%= render layout: "shared/page_header", locals: {
+      title: "Edit #{@form.name}",
+      description: "Changes apply to everyone who has not answered yet."
+    } do %>
+  <%= link_to "Back to form", admin_form_path(@form), class: "btn btn-secondary" %>
+<% end %>
+
+<%= render "form", form: @form %>

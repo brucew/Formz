@@ -1,0 +1,50 @@
+<%# One editable field row. Pass the fields_for builder as `field_builder`. %>
+<div class="space-y-4 rounded-md bg-slate-50 p-4 ring-1 ring-slate-200"
+     data-nested-fields-target="row"
+     data-controller="field-type"
+     data-field-type-choice-based-types-value="<%= choice_based_input_types.to_json %>">
+  <%= field_builder.hidden_field :_destroy %>
+
+  <div>
+    <%= field_builder.label :label, "Question", class: "form-label" %>
+    <%= field_builder.text_field :label, class: "form-control", placeholder: "What is your full name?" %>
+  </div>
+
+  <div>
+    <%= field_builder.label :description, "Help text", class: "form-label" %>
+    <%= field_builder.text_field :description, class: "form-control" %>
+    <p class="form-hint">Optional. Shown under the question.</p>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <%= field_builder.label :input_type, "Input type", class: "form-label" %>
+      <%= field_builder.select :input_type, field_input_type_options, {},
+                               class: "form-control",
+                               data: { field_type_target: "inputType", action: "field-type#inputTypeChanged" } %>
+    </div>
+
+    <div>
+      <%= field_builder.label :value_type, "Stores", class: "form-label" %>
+      <%= field_builder.select :value_type, field_value_type_options, {}, class: "form-control" %>
+    </div>
+  </div>
+
+  <div data-field-type-target="choices">
+    <%= field_builder.label :choices_text, "Choices", class: "form-label" %>
+    <%= field_builder.text_area :choices_text, rows: 4, class: "form-control",
+                                data: { field_type_target: "choicesInput" } %>
+    <p class="form-hint">One option per line.</p>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <label class="flex items-center gap-2 text-sm text-slate-700">
+      <%= field_builder.check_box :required, class: "form-check" %>
+      An answer is required
+    </label>
+
+    <button type="button" class="btn btn-danger" data-action="nested-fields#remove">
+      Remove field
+    </button>
+  </div>
+</div>

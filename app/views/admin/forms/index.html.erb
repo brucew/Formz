@@ -1,0 +1,36 @@
+<% content_for :title, "My forms" %>
+
+<%= render layout: "shared/page_header", locals: {
+      title: "My forms",
+      description: "Every form you own, including the ones you have deleted."
+    } do %>
+  <%= link_to "New form", new_admin_form_path, class: "btn btn-primary" %>
+<% end %>
+
+<% if @forms.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="data-table">
+        <thead class="bg-slate-50">
+          <tr>
+            <th scope="col">Form</th>
+            <th scope="col">Fields</th>
+            <th scope="col">Submissions</th>
+            <th scope="col">Status</th>
+            <th scope="col"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          <%= render partial: "form_row", collection: @forms, as: :form %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <%= render layout: "shared/empty_state", locals: {
+        title: "No forms yet",
+        description: "Build your first form and it becomes available to everyone straight away."
+      } do %>
+    <%= link_to "New form", new_admin_form_path, class: "btn btn-primary" %>
+  <% end %>
+<% end %>
