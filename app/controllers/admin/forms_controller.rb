@@ -1,6 +1,9 @@
 module Admin
   class FormsController < Admin::BaseController
-    before_action :set_form, only: %i[show edit update destroy]
+    # Scoping the lookup through the association means another admin's form is missing
+    # from the query itself rather than relying on a permission check further down.
+    before_action -> { @form = current_user.forms.find(params[:id]) },
+                  only: %i[show edit update destroy]
     before_action :refuse_deleted_form, only: %i[edit update]
 
     # Deleted forms stay in this list. They are the admin's own history, and their
@@ -46,12 +49,6 @@ module Admin
     end
 
     private
-
-      # Scoping through the association means another admin's form is missing from the
-      # query itself rather than relying on a permission check further down.
-      def set_form
-        @form = current_user.forms.find(params[:id])
-      end
 
       def refuse_deleted_form
         return unless @form.deleted?
