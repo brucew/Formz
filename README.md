@@ -146,7 +146,7 @@ A few details worth knowing before you read too much into a number:
 - Free text is **not** summarised into sentiment, keyword counts, or a word cloud. You get
   counts and a sample, with the submissions table for the rest.
 
-Deleted forms can still be analysed, on the same reasoning that they can still be exported.
+Run `rails formz:demo_data` to generate a data analysis demo form and its submission data.
 
 ## How it fits together
 
