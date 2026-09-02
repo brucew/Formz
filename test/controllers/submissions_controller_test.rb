@@ -176,4 +176,54 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to form_submission_path(@survey)
     assert_equal "Walter Skinner", users(:admin).submissions.find_by!(form: @survey).answer_for(@full_name)
   end
+
+
+  test "an answer error names the input that caused it" do
+    sign_in_as users(:member)
+
+    post form_submission_path(@survey),
+         params: { submission: { values: { fields(:team).id.to_s => "Design" } } }
+
+    assert_response :unprocessable_content
+    error_id = "submission_values_#{@full_name.id}_error"
+    assert_select "input[name=?][aria-invalid=true][aria-describedby=?]",
+                  "submission[values][#{@full_name.id}]", error_id
+    assert_select "##{error_id}", text: /#{@full_name.label} is required/
+  end
+
+  test "an input with no error is described by nothing" do
+    sign_in_as users(:member)
+
+    post form_submission_path(@survey),
+         params: { submission: { values: { fields(:team).id.to_s => "Design" } } }
+
+    assert_select "input[name=?][aria-invalid=false]", "submission[values][#{fields(:years_experience).id}]"
+    assert_select "input[name=?][aria-describedby]", "submission[values][#{fields(:years_experience).id}]", count: 0
+  end
+
+  test "an error on a choice group is named by every control in the group" do
+    sign_in_as users(:member)
+
+    post form_submission_path(@survey), params: { submission: { values: {
+      @full_name.id.to_s => "Dana Scully",
+      fields(:perks).id.to_s => [ "Nothing on the list" ]
+    } } }
+
+    assert_response :unprocessable_content
+    error_id = "submission_values_#{fields(:perks).id}_error"
+    assert_select "input[type=checkbox][name=?][aria-describedby=?]",
+                  "submission[values][#{fields(:perks).id}][]", error_id, count: 2
+    assert_select "fieldset[aria-invalid=true]", 1
+    assert_select "##{error_id}", text: /not one of its choices/
+  end
+
+  test "the required marker is spelled out for screen readers" do
+    sign_in_as users(:member)
+
+    get new_form_submission_path(@survey)
+
+    assert_select "p span.sr-only", text: "with an asterisk"
+    assert_select "label[for=?] span.sr-only", "submission_values_#{@full_name.id}", text: "required"
+    assert_select "span[aria-hidden=true]", text: "*", count: 2
+  end
 end

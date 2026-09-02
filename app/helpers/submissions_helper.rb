@@ -1,11 +1,12 @@
 module SubmissionsHelper
   # A required field is marked three ways: this glyph, the required attribute on the
   # input, and aria-required on choice groups where the attribute cannot carry across
-  # a set. The glyph is hidden from screen readers, which get the word instead.
-  def required_answer_marker
+  # a set. The glyph is hidden from screen readers, which are given words instead —
+  # "required" beside a label, and the name of the glyph where a sentence explains it.
+  def required_answer_marker(announced_as: "required")
     safe_join([
       tag.span("*", class: "ml-0.5 font-semibold text-red-600", aria: { hidden: true }),
-      tag.span("required", class: "sr-only")
+      tag.span(announced_as, class: "sr-only")
     ])
   end
 

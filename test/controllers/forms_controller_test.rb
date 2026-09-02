@@ -102,4 +102,68 @@ class FormsControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "li", text: /Yours/
   end
+
+  test "show offers an owning admin a link to manage the form" do
+    sign_in_as users(:admin)
+
+    get form_path(forms(:survey))
+
+    assert_response :success
+    assert_select "a[href=?]", admin_form_path(forms(:survey)), text: "Manage"
+  end
+
+  test "show offers no management link for a form another admin owns" do
+    sign_in_as users(:admin)
+
+    get form_path(forms(:other_admins_form))
+
+    assert_response :success
+    assert_select "a", text: "Manage", count: 0
+  end
+
+  test "show offers a member no management link" do
+    sign_in_as users(:member)
+
+    get form_path(forms(:survey))
+
+    assert_response :success
+    assert_select "a", text: "Manage", count: 0
+  end
+
+  test "show says the form belongs to the admin reading it" do
+    sign_in_as users(:admin)
+
+    get form_path(forms(:survey))
+
+    assert_select "p", text: /Yours/
+    assert_no_match(/From #{users(:admin).email}/, response.body)
+  end
+
+  test "show names the owner of a form the reader does not own" do
+    sign_in_as users(:member)
+
+    get form_path(forms(:survey))
+
+    assert_match "From #{forms(:survey).owner.email}", response.body
+  end
+
+  test "each row action link names the form it acts on" do
+    sign_in_as users(:member)
+
+    get forms_path
+
+    assert_select "a[href=?][aria-label=?]",
+                  new_form_submission_path(forms(:survey)), "Fill out #{forms(:survey).name}"
+    assert_select "a[href=?][aria-label=?]",
+                  form_submission_path(forms(:locked_form)), "View your answers to #{forms(:locked_form).name}"
+  end
+
+  test "the manage link names the form it manages" do
+    sign_in_as users(:admin)
+
+    get forms_path
+
+    assert_select "a[href=?][aria-label=?]",
+                  admin_form_path(forms(:survey)), "Manage #{forms(:survey).name}"
+  end
 end

@@ -8,7 +8,8 @@
 
     <div>
       <%= form.label :email, "Email address", class: "form-label" %>
-      <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true, class: "form-control" %>
+      <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true,
+            class: "form-control", "aria-invalid": resource.errors[:email].any? %>
     </div>
 
     <%= form.submit "Send reset instructions", class: "btn btn-primary w-full" %>

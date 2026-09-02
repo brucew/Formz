@@ -1,6 +1,11 @@
 <% content_for :title, @form.name %>
 
 <%= render layout: "shared/page_header", locals: { title: @form.name, description: @form.description } do %>
+  <% if current_user.admin? && @form.owned_by?(current_user) %>
+    <%= link_to "Manage", admin_form_path(@form), class: "btn btn-secondary",
+          aria: { label: "Manage #{@form.name}" } %>
+  <% end %>
+
   <% if @already_submitted %>
     <%= link_to "View your answers", form_submission_path(@form), class: "btn btn-primary" %>
   <% else %>
@@ -8,7 +13,13 @@
   <% end %>
 <% end %>
 
-<p class="mb-6 prose-muted">From <%= @form.owner.email %></p>
+<p class="mb-6 prose-muted">
+  <% if @form.owned_by?(current_user) %>
+    Yours
+  <% else %>
+    From <%= @form.owner.email %>
+  <% end %>
+</p>
 
 <% if @form.fields.any? %>
   <div class="card divide-y divide-slate-200">
@@ -38,5 +49,5 @@
 <% else %>
   <%= render "shared/empty_state",
         title: "No questions yet",
-        description: "This form has not been given any questions." %>
+        description: "This form has no questions to answer yet." %>
 <% end %>

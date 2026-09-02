@@ -7,26 +7,34 @@
 
     <div>
       <%= form.label :email, "Email address", class: "form-label" %>
-      <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true, class: "form-control" %>
+      <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true,
+            class: "form-control", "aria-invalid": resource.errors[:email].any? %>
     </div>
 
     <div>
       <%= form.label :password, "New password", class: "form-label" %>
-      <%= form.password_field :password, autocomplete: "new-password", class: "form-control" %>
-      <p class="form-hint">
+      <%= form.password_field :password, autocomplete: "new-password", class: "form-control",
+            "aria-invalid": resource.errors[:password].any?,
+            "aria-describedby": form.field_id(:password, :hint) %>
+      <p id="<%= form.field_id(:password, :hint) %>" class="form-hint">
         Leave blank to keep your current password<%= ", #{@minimum_password_length} characters minimum" if @minimum_password_length %>.
       </p>
     </div>
 
     <div>
       <%= form.label :password_confirmation, "Confirm new password", class: "form-label" %>
-      <%= form.password_field :password_confirmation, autocomplete: "new-password", class: "form-control" %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password", class: "form-control",
+            "aria-invalid": resource.errors[:password_confirmation].any? %>
     </div>
 
     <div>
       <%= form.label :current_password, class: "form-label" %>
-      <%= form.password_field :current_password, autocomplete: "current-password", required: true, class: "form-control" %>
-      <p class="form-hint">We need your current password to confirm these changes.</p>
+      <%= form.password_field :current_password, autocomplete: "current-password", required: true,
+            class: "form-control", "aria-invalid": resource.errors[:current_password].any?,
+            "aria-describedby": form.field_id(:current_password, :hint) %>
+      <p id="<%= form.field_id(:current_password, :hint) %>" class="form-hint">
+        We need your current password to confirm these changes.
+      </p>
     </div>
 
     <div class="flex flex-wrap items-center gap-3">
@@ -36,13 +44,13 @@
   <% end %>
 
   <section class="mt-8 border-t border-slate-200 pt-6">
-    <h2 class="text-base font-semibold text-slate-900">Cancel my account</h2>
+    <h2 class="text-base font-semibold text-slate-900">Delete my account</h2>
     <p class="mt-1 prose-muted">
-      Cancelling deletes your account and every submission you have made. This cannot be undone.
+      Deleting your account also deletes every submission you have made. This cannot be undone.
     </p>
-    <%= button_to "Cancel my account", registration_path(resource_name), method: :delete,
+    <%= button_to "Delete my account", registration_path(resource_name), method: :delete,
                   class: "btn btn-danger mt-4",
                   form_class: "inline-block",
-                  data: { turbo_confirm: "Cancel your account? This deletes your account and every submission you have made, and cannot be undone." } %>
+                  data: { turbo_confirm: "Delete your account? This deletes your account and every submission you have made, and cannot be undone." } %>
   </section>
 <% end %>

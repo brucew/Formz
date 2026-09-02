@@ -113,6 +113,35 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "input[type=password][name=?]", "user[password]"
   end
 
+  test "the sign up password field is described by its own hint" do
+    get new_user_registration_path
+
+    assert_select "input[name=?][aria-describedby=?]", "user[password]", "user_password_hint"
+    assert_select "p#user_password_hint", text: /characters minimum/
+  end
+
+  test "a rejected sign up marks the field that failed" do
+    post user_registration_path, params: {
+      user: { email: users(:member).email, password: "password123", password_confirmation: "password123" }
+    }
+
+    assert_response :unprocessable_content
+    assert_select "input[name=?][aria-invalid=true]", "user[email]"
+    assert_select "input[name=?][aria-invalid=false]", "user[password]"
+    assert_select "[role=alert]", text: /Email has already been taken/
+  end
+
+  test "account settings keeps deleting an account apart from saving changes" do
+    sign_in_as users(:member)
+
+    get edit_user_registration_path
+
+    assert_response :success
+    assert_select "input[type=submit].btn-primary[value=?]", "Save changes"
+    assert_select "button.btn-danger[data-turbo-confirm]", text: "Delete my account"
+    assert_select "input[name=?][aria-describedby=?]", "user[current_password]", "user_current_password_hint"
+  end
+
   private
     # Warden stores the signed-in user as [[id], password_salt].
     def signed_in_user_id

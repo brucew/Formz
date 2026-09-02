@@ -7,20 +7,26 @@
 
     <div>
       <%= form.label :email, "Email address", class: "form-label" %>
-      <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true, class: "form-control" %>
+      <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true,
+            class: "form-control", "aria-invalid": resource.errors[:email].any? %>
     </div>
 
     <div>
       <%= form.label :password, class: "form-label" %>
-      <%= form.password_field :password, autocomplete: "new-password", required: true, class: "form-control" %>
+      <%= form.password_field :password, autocomplete: "new-password", required: true,
+            class: "form-control", "aria-invalid": resource.errors[:password].any?,
+            "aria-describedby": (form.field_id(:password, :hint) if @minimum_password_length) %>
       <% if @minimum_password_length %>
-        <p class="form-hint"><%= @minimum_password_length %> characters minimum.</p>
+        <p id="<%= form.field_id(:password, :hint) %>" class="form-hint">
+          <%= @minimum_password_length %> characters minimum.
+        </p>
       <% end %>
     </div>
 
     <div>
       <%= form.label :password_confirmation, "Confirm password", class: "form-label" %>
-      <%= form.password_field :password_confirmation, autocomplete: "new-password", required: true, class: "form-control" %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password", required: true,
+            class: "form-control", "aria-invalid": resource.errors[:password_confirmation].any? %>
     </div>
 
     <%= form.submit "Create account", class: "btn btn-primary w-full" %>

@@ -7,7 +7,7 @@
 
   <%= form_with model: @submission, url: form_submission_path(@form) do |form| %>
     <p class="mb-6 prose-muted">
-      Questions marked <%= required_answer_marker %> must be answered before you can submit.
+      Questions marked <%= required_answer_marker(announced_as: "with an asterisk") %> must be answered before you can submit.
     </p>
 
     <% if @form.fields.any? %>
