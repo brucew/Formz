@@ -17,6 +17,15 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# Email/password authentication [https://github.com/heartcombo/devise]
+gem "devise"
+
+# Tailwind CSS via the standalone binary, no Node toolchain [https://github.com/rails/tailwindcss-rails]
+gem "tailwindcss-rails"
+
+# CSV is a bundled gem as of Ruby 3.4 and will not load under Bundler unless declared
+gem "csv"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 
