@@ -85,6 +85,16 @@ class SubmissionTest < ActiveSupport::TestCase
     assert_not submission.reload.values.key?(fields(:years_experience).id.to_s)
   end
 
+  test "knows which fields it answered" do
+    submission = build_survey_submission(answers(perks: %w[Gym], years_experience: ""))
+    submission.save!
+
+    assert submission.answered?(fields(:full_name))
+    assert submission.answered?(fields(:perks))
+    assert_not submission.answered?(fields(:years_experience))
+    assert_not submission.answered?(fields(:team))
+  end
+
   test "displays a multiple choice answer as a joined list" do
     submission = build_survey_submission(answers(perks: %w[Gym Transit]))
     submission.save!

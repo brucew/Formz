@@ -1,0 +1,39 @@
+<%# One question and everything that can honestly be said about its answers. %>
+<section class="card px-6 py-5" aria-labelledby="question-<%= summary.field.id %>">
+  <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
+    <div>
+      <h2 id="question-<%= summary.field.id %>" class="text-base font-semibold text-slate-900">
+        <span class="text-slate-400"><%= number %>.</span>
+        <%= summary.field.label %>
+        <% if summary.field.required? %>
+          <span class="badge badge-required">Required</span>
+        <% end %>
+      </h2>
+      <% if summary.field.description.present? %>
+        <p class="mt-1 prose-muted"><%= summary.field.description %></p>
+      <% end %>
+    </div>
+
+    <p class="text-xs whitespace-nowrap text-slate-500">
+      <%= field_input_type_label(summary.field.input_type) %> · stores <%= summary.field.value_type %>
+    </p>
+  </div>
+
+  <p class="mt-3 text-sm text-slate-600">
+    Answered by
+    <span class="font-semibold tabular-nums text-slate-900"><%= summary.answered_count %></span>
+    of <%= pluralize(summary.submission_count, "person", plural: "people") %>
+    (<%= analysis_share(summary.response_rate) %>)<% if summary.unanswered_count.positive? %>,
+    <%= summary.unanswered_count %> left it blank<% end %>.
+  </p>
+
+  <div class="mt-4">
+    <% if summary.answered? %>
+      <%= render summary.kind.to_s, summary: summary %>
+    <% else %>
+      <p class="rounded-md bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        Nobody has answered this question, so there is nothing to summarise.
+      </p>
+    <% end %>
+  </div>
+</section>

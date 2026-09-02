@@ -1,0 +1,30 @@
+<%# The four numbers a set of numbers can be trusted to give up. No total: adding up ages
+    or scores produces a number that means nothing. %>
+<dl class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+  <div class="rounded-md bg-slate-50 px-4 py-3">
+    <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Smallest</dt>
+    <dd class="mt-1 text-lg font-semibold tabular-nums text-slate-900"><%= analysis_number(summary.minimum) %></dd>
+  </div>
+  <div class="rounded-md bg-slate-50 px-4 py-3">
+    <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Largest</dt>
+    <dd class="mt-1 text-lg font-semibold tabular-nums text-slate-900"><%= analysis_number(summary.maximum) %></dd>
+  </div>
+  <div class="rounded-md bg-slate-50 px-4 py-3">
+    <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Mean</dt>
+    <dd class="mt-1 text-lg font-semibold tabular-nums text-slate-900"><%= analysis_number(summary.mean) %></dd>
+  </div>
+  <div class="rounded-md bg-slate-50 px-4 py-3">
+    <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Median</dt>
+    <dd class="mt-1 text-lg font-semibold tabular-nums text-slate-900"><%= analysis_number(summary.median) %></dd>
+  </div>
+</dl>
+
+<% if summary.sparse? %>
+  <p class="mt-4 text-sm text-slate-600">
+    Every answer, in order:
+    <span class="font-medium tabular-nums text-slate-900">
+      <%= summary.sorted_answers.map { |answer| analysis_number(answer) }.to_sentence %>
+    </span>
+  </p>
+  <%= render "small_sample", count: summary.answered_count %>
+<% end %>

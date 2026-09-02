@@ -1,0 +1,40 @@
+<% content_for :title, "#{@form.name} analysis" %>
+
+<%= render layout: "shared/page_header", locals: {
+      title: "#{@form.name} analysis",
+      description: "What the answers add up to, question by question."
+    } do %>
+  <%= link_to "Back to form", admin_form_path(@form), class: "btn btn-secondary" %>
+  <%= link_to "Submissions", admin_form_submissions_path(@form), class: "btn btn-primary" %>
+<% end %>
+
+<% if @form.deleted? %>
+  <p class="mb-6 rounded-md bg-slate-100 px-4 py-3 text-sm text-slate-700 ring-1 ring-inset ring-slate-300" role="status">
+    <span class="badge badge-deleted">Deleted</span>
+    This form is deleted, so no more answers are coming. Everything it collected is kept
+    and is analysed below.
+  </p>
+<% end %>
+
+<% if @analysis.any_submissions? %>
+  <%= render "overview", analysis: @analysis %>
+
+  <% if @analysis.field_count.zero? %>
+    <p class="card px-6 py-8 text-center prose-muted">
+      This form has no questions, so there is nothing to break down.
+    </p>
+  <% else %>
+    <div class="mt-8 space-y-6">
+      <% @analysis.field_summaries.each_with_index do |summary, index| %>
+        <%= render "question", summary: summary, number: index + 1 %>
+      <% end %>
+    </div>
+  <% end %>
+<% else %>
+  <%= render layout: "shared/empty_state", locals: {
+        title: "Nothing to analyse yet",
+        description: "This form has no submissions. Once people start answering, this page breaks their answers down question by question."
+      } do %>
+    <%= link_to "Back to form", admin_form_path(@form), class: "btn btn-secondary" %>
+  <% end %>
+<% end %>

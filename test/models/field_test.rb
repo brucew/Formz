@@ -89,6 +89,16 @@ class FieldTest < ActiveSupport::TestCase
     assert_not fields(:perks).valid_choice?(%w[Gym Sauna])
   end
 
+  test "each field summarises its answers in the shape its answers actually have" do
+    assert_equal :texts, Field.new(input_type: :email_field, value_type: :string).summary_of([]).kind
+    assert_equal :texts, Field.new(input_type: :text_area, value_type: :string).summary_of([]).kind
+    assert_equal :numbers, fields(:years_experience).summary_of([]).kind
+    assert_equal :dates, fields(:start_date).summary_of([]).kind
+    assert_equal :choices, fields(:team).summary_of([]).kind
+    assert_equal :choices, fields(:perks).summary_of([]).kind
+    assert_equal :choices, Field.new(input_type: :radio_button, value_type: :string).summary_of([]).kind
+  end
+
   test "reads and writes choices as one per line" do
     field = fields(:team)
     field.choices_text = "Design\n  Engineering  \n\nSupport\n"

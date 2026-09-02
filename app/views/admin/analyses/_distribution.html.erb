@@ -1,0 +1,28 @@
+<%# A bar per group. The bar is an SVG rectangle in a hundred unit wide viewBox rather
+    than a styled width, so the proportion is an attribute and not an inline style, and
+    it is hidden from screen readers because every number it draws is in the text beside
+    it. Pass scale to measure the bars against the largest group rather than against the
+    whole. %>
+<% scale = local_assigns.fetch(:scale, 1.0) %>
+<ul class="mt-3 space-y-3">
+  <% tallies.each do |tally| %>
+    <li>
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+        <span class="text-sm text-slate-900"><%= tally.label %></span>
+        <span class="text-sm tabular-nums text-slate-600">
+          <%= tally.count %><span class="sr-only"> <%= unit.pluralize(tally.count) %></span>
+          <span class="text-slate-300" aria-hidden="true">·</span>
+          <%= analysis_share(tally.share) %>
+        </span>
+      </div>
+
+      <div class="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+        <svg class="h-full w-full" viewBox="0 0 100 4" preserveAspectRatio="none"
+             aria-hidden="true" focusable="false">
+          <rect x="0" y="0" height="4" width="<%= analysis_bar_length(tally.share, scale: scale) %>"
+                class="fill-indigo-600"></rect>
+        </svg>
+      </div>
+    </li>
+  <% end %>
+</ul>

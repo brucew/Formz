@@ -1,0 +1,23 @@
+<%# Written answers do not add up to a number, so this counts them, says how much of that
+    was repeated, and shows a few of them rather than inventing an analysis. %>
+<p class="prose-muted">
+  <%= pluralize(summary.answered_count, "person", plural: "people") %> wrote something<% if summary.repeated? %>,
+    <%= summary.distinct_count == 1 ? "every one of them the same" : "#{pluralize(summary.distinct_count, 'distinct answer')} between them" %><% end %>.
+  Written answers cannot be summarised into a number, so here
+  <%= summary.examples.many? ? "are some of them" : "is what came in" %>.
+</p>
+
+<ul class="mt-3 space-y-2">
+  <% summary.examples.each do |example| %>
+    <li class="rounded-md bg-slate-50 px-4 py-3 text-sm break-words whitespace-pre-line text-slate-700">
+      <%= example %>
+    </li>
+  <% end %>
+</ul>
+
+<% if summary.unshown_count.positive? %>
+  <p class="mt-3 prose-muted">
+    <%= pluralize(summary.unshown_count, "further answer") %> not shown.
+    <%= link_to "Read every answer", admin_form_submissions_path(summary.field.form_id), class: "btn-link" %>
+  </p>
+<% end %>

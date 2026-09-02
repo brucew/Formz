@@ -1,0 +1,50 @@
+<%# The form as a whole: how much came in, over what period, and how completely it was
+    answered. %>
+<h2 class="text-base font-semibold text-slate-900">At a glance</h2>
+
+<dl class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="card px-5 py-4">
+    <dt class="text-sm font-medium text-slate-500">Submissions</dt>
+    <dd class="mt-1 text-2xl font-semibold tabular-nums text-slate-900"><%= analysis.submission_count %></dd>
+    <dd class="mt-1 text-sm text-slate-500">
+      <%= pluralize(analysis.field_count, "question") %> asked
+    </dd>
+  </div>
+
+  <div class="card px-5 py-4">
+    <dt class="text-sm font-medium text-slate-500">Collected over</dt>
+    <dd class="mt-1 text-2xl font-semibold tabular-nums text-slate-900">
+      <%= pluralize(analysis.days_covered, "day") %>
+    </dd>
+    <dd class="mt-1 text-sm text-slate-500">
+      <% if analysis.days_covered == 1 %>
+        All on <%= analysis_date(analysis.first_submitted_at.to_date) %>
+      <% else %>
+        <%= analysis_date(analysis.first_submitted_at.to_date) %> to
+        <%= analysis_date(analysis.last_submitted_at.to_date) %>
+      <% end %>
+    </dd>
+  </div>
+
+  <% if analysis.answer_rate %>
+    <div class="card px-5 py-4">
+      <dt class="text-sm font-medium text-slate-500">Questions answered</dt>
+      <dd class="mt-1 text-2xl font-semibold tabular-nums text-slate-900">
+        <%= analysis_share(analysis.answer_rate) %>
+      </dd>
+      <dd class="mt-1 text-sm text-slate-500">
+        <%= analysis.given_answers %> of <%= analysis.possible_answers %> possible answers given
+      </dd>
+    </div>
+
+    <div class="card px-5 py-4">
+      <dt class="text-sm font-medium text-slate-500">Answered in full</dt>
+      <dd class="mt-1 text-2xl font-semibold tabular-nums text-slate-900">
+        <%= analysis.complete_submission_count %>
+      </dd>
+      <dd class="mt-1 text-sm text-slate-500">
+        left no question blank, optional ones included
+      </dd>
+    </div>
+  <% end %>
+</dl>

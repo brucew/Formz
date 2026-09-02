@@ -4,6 +4,7 @@
       title: @form.name,
       description: @form.description
     } do %>
+  <%= link_to "Analysis", admin_form_analysis_path(@form), class: "btn btn-secondary" %>
   <%= link_to "Submissions", admin_form_submissions_path(@form), class: "btn btn-secondary" %>
   <% unless @form.deleted? %>
     <%= link_to "Edit", edit_admin_form_path(@form), class: "btn btn-primary" %>

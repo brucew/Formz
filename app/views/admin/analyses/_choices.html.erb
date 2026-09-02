@@ -1,0 +1,28 @@
+<%# How many people picked each option. The denominator is the people who answered the
+    question, which is what keeps a check box field honest: one person can pick several
+    options, so its shares are free to add up to more than 100%. %>
+<p class="prose-muted">
+  <% if summary.multiple? %>
+    <%= pluralize(summary.selection_count, "option") %> picked in total. Each person could
+    pick any number of them, so the shares below are of the
+    <%= pluralize(summary.answered_count, "person", plural: "people") %> who answered and
+    can add up to more than 100%.
+  <% else %>
+    Shares are of the <%= pluralize(summary.answered_count, "person", plural: "people") %>
+    who answered.
+  <% end %>
+</p>
+
+<%= render "distribution", tallies: summary.tallies, unit: "person" %>
+
+<% if summary.unexpected? %>
+  <h3 class="mt-6 text-sm font-semibold text-slate-900">Answers this question no longer offers</h3>
+  <p class="mt-1 prose-muted">
+    Given before the choices were what they are now. They are counted in the shares above.
+  </p>
+  <%= render "distribution", tallies: summary.unexpected_tallies, unit: "person" %>
+<% end %>
+
+<% if summary.sparse? %>
+  <%= render "small_sample", count: summary.answered_count %>
+<% end %>

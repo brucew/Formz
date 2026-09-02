@@ -1,0 +1,31 @@
+<%# The range the answers cover and their shape across it. The bars are measured against
+    the busiest period rather than against the whole, so the shape stays visible when the
+    answers are spread thinly; the percentages beside them are of every answer given. %>
+<dl class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+  <div class="rounded-md bg-slate-50 px-4 py-3">
+    <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Earliest</dt>
+    <dd class="mt-1 text-sm font-semibold text-slate-900"><%= analysis_date(summary.earliest) %></dd>
+  </div>
+  <div class="rounded-md bg-slate-50 px-4 py-3">
+    <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Latest</dt>
+    <dd class="mt-1 text-sm font-semibold text-slate-900"><%= analysis_date(summary.latest) %></dd>
+  </div>
+  <div class="rounded-md bg-slate-50 px-4 py-3">
+    <dt class="text-xs font-medium tracking-wide text-slate-500 uppercase">Range</dt>
+    <dd class="mt-1 text-sm font-semibold tabular-nums text-slate-900">
+      <%= pluralize(summary.span_in_days, "day") %>
+    </dd>
+  </div>
+</dl>
+
+<% if summary.timeline.many? %>
+  <h3 class="mt-6 text-sm font-semibold text-slate-900">
+    Answers by <%= summary.granularity %>
+  </h3>
+  <%= render "distribution", tallies: analysis_timeline_tallies(summary),
+             scale: summary.busiest_share, unit: "answer" %>
+<% end %>
+
+<% if summary.sparse? %>
+  <%= render "small_sample", count: summary.answered_count %>
+<% end %>

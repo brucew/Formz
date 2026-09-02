@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :forms do
       resources :submissions, only: :index
+      resource :analysis, only: :show
     end
   end
 

@@ -5,6 +5,7 @@
       description: "Everything people have answered on this form."
     } do %>
   <%= link_to "Back to form", admin_form_path(@form), class: "btn btn-secondary" %>
+  <%= link_to "Analysis", admin_form_analysis_path(@form), class: "btn btn-secondary" %>
   <% if @submissions.any? %>
     <%= link_to "Download CSV", admin_form_submissions_path(@form, format: :csv),
                 class: "btn btn-primary" %>

@@ -60,6 +60,13 @@ class Field < ApplicationRecord
     end
   end
 
+  # The summary of these submissions' answers to this field. The submissions are handed
+  # in already loaded, so summarising a whole form costs one query rather than one per
+  # field.
+  def summary_of(submissions)
+    summary_class.new(self, submissions)
+  end
+
   def valid_choice?(answer)
     return true unless choice_based?
 
@@ -67,6 +74,16 @@ class Field < ApplicationRecord
   end
 
   private
+
+    def summary_class
+      return FieldSummary::Choices if choice_based?
+
+      case value_type
+      when "number" then FieldSummary::Numbers
+      when "date"   then FieldSummary::Dates
+      else FieldSummary::Texts
+      end
+    end
 
     def cast_number(raw)
       BigDecimal(raw.to_s.strip)

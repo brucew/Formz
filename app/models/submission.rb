@@ -7,6 +7,10 @@ class Submission < ApplicationRecord
 
   before_save :cast_values
 
+  def answered?(field)
+    field.answered?(values[field.id.to_s])
+  end
+
   def answer_for(field)
     field.cast(values[field.id.to_s])
   end
