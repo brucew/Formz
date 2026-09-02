@@ -1,0 +1,12 @@
+<% if record.errors.any? %>
+  <div class="mb-6 rounded-md bg-red-50 px-4 py-3 ring-1 ring-inset ring-red-200" role="alert">
+    <h2 class="text-sm font-semibold text-red-800">
+      <%= pluralize(record.errors.count, "problem") %> stopped this from being saved
+    </h2>
+    <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-red-700">
+      <% record.errors.each do |error| %>
+        <li><%= error.full_message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

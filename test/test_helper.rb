@@ -13,3 +13,12 @@ module ActiveSupport
     # Add more helper methods to be used by all tests here...
   end
 end
+
+module ActionDispatch
+  class IntegrationTest
+    # Every user fixture shares this password.
+    def sign_in_as(user, password: "password123")
+      post user_session_path, params: { user: { email: user.email, password: password } }
+    end
+  end
+end

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full bg-slate-50">
   <head>
     <title><%= content_for(:title) || "Formz" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -11,20 +11,40 @@
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="h-full text-slate-900 antialiased">
+    <% if user_signed_in? %>
+      <header class="border-b border-slate-200 bg-white">
+        <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4 sm:px-6">
+          <%= link_to "Formz", root_path, class: "text-lg font-semibold tracking-tight text-slate-900" %>
+
+          <nav class="flex items-center gap-4 text-sm" aria-label="Main">
+            <% if current_user.admin? %>
+              <%= link_to "My forms", admin_forms_path, class: "font-medium text-slate-600 hover:text-slate-900" %>
+            <% end %>
+            <%= link_to "All forms", forms_path, class: "font-medium text-slate-600 hover:text-slate-900" %>
+          </nav>
+
+          <div class="ml-auto flex items-center gap-3 text-sm">
+            <span class="text-slate-500"><%= current_user.email %></span>
+            <% if current_user.admin? %>
+              <span class="badge badge-admin">Admin</span>
+            <% end %>
+            <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn btn-secondary" %>
+          </div>
+        </div>
+      </header>
+    <% end %>
+
+    <main class="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+      <%= render "shared/flash" %>
       <%= yield %>
     </main>
   </body>

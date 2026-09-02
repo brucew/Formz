@@ -1,0 +1,14 @@
+<%# Renders a page title with optional description. Pass actions as a block:
+    <%%= render layout: "shared/page_header", locals: { title: "Forms" } do %>...<%% end %> %>
+<div class="mb-8 flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <h1 class="page-title"><%= title %></h1>
+    <% if local_assigns[:description].present? %>
+      <p class="mt-1 prose-muted"><%= description %></p>
+    <% end %>
+  </div>
+
+  <% if defined?(yield) %>
+    <div class="flex items-center gap-3"><%= yield %></div>
+  <% end %>
+</div>
