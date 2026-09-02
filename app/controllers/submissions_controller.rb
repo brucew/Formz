@@ -1,5 +1,5 @@
 class SubmissionsController < ApplicationController
-  before_action :set_active_form, except: :show
+  before_action :set_answerable_form, except: :show
   before_action :redirect_to_existing_submission, except: :show
 
   def new
@@ -27,11 +27,19 @@ class SubmissionsController < ApplicationController
 
   private
 
-    def set_active_form
+    # Answering a form with no questions would store an empty submission, and that alone
+    # locks the form's structure — leaving its owner unable to ever add the questions.
+    def set_answerable_form
       @form = Form.find(params[:form_id])
-      return if @form.active?
+      return if @form.answerable?
 
-      redirect_to forms_path, alert: "That form has been deleted and can no longer be filled out."
+      redirect_to forms_path, alert: answer_refusal_for(@form)
+    end
+
+    def answer_refusal_for(form)
+      return "That form has been deleted and can no longer be filled out." unless form.active?
+
+      "That form has no questions yet, so there is nothing to answer."
     end
 
     def redirect_to_existing_submission

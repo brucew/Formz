@@ -8,8 +8,10 @@
 
   <% if @already_submitted %>
     <%= link_to "View your answers", form_submission_path(@form), class: "btn btn-primary" %>
-  <% else %>
+  <% elsif @form.answerable? %>
     <%= link_to "Fill out this form", new_form_submission_path(@form), class: "btn btn-primary" %>
+  <% else %>
+    <%= link_to "Add questions", edit_admin_form_path(@form), class: "btn btn-primary" %>
   <% end %>
 <% end %>
 
@@ -49,5 +51,5 @@
 <% else %>
   <%= render "shared/empty_state",
         title: "No questions yet",
-        description: "This form has no questions to answer yet." %>
+        description: "This form has no questions to answer yet. Only you can see it until you add some." %>
 <% end %>

@@ -217,6 +217,23 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "##{error_id}", text: /not one of its choices/
   end
 
+  # Answering an empty form stored an empty submission, which locked the form's structure
+  # and left its owner permanently unable to add the questions.
+  test "a form with no questions cannot be answered" do
+    empty = forms(:other_admins_form)
+    sign_in_as users(:member)
+
+    get new_form_submission_path(empty)
+
+    assert_redirected_to forms_path
+    assert_equal "That form has no questions yet, so there is nothing to answer.", flash[:alert]
+
+    assert_no_difference "Submission.count" do
+      post form_submission_path(empty), params: { submission: { values: {} } }
+    end
+    assert_not empty.reload.locked?
+  end
+
   # A choice's own control id comes from its downcased value, so a choice named "Error"
   # once took the same id as the field's error container and made aria-describedby
   # ambiguous — pointing the error message at a check box instead of at itself.

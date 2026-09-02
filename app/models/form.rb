@@ -13,6 +13,12 @@ class Form < ApplicationRecord
 
   scope :active, -> { where(active: true) }
 
+  # A form with no questions has nothing to answer, so it stays out of the member facing
+  # list until its owner has written it. Subquery rather than a join, so a form with many
+  # fields still comes back once.
+  scope :answerable, -> { active.where(id: Field.select(:form_id)) }
+  scope :answerable_or_owned_by, ->(user) { answerable.or(active.where(owner: user)) }
+
   validates :name, presence: true
   validate :fields_unchanged_when_locked, if: :locked?
   validate :deleted_form_unchanged, on: :update
@@ -29,6 +35,10 @@ class Form < ApplicationRecord
     active?
   end
 
+  def answerable?
+    active? && fields.any?
+  end
+
   def owned_by?(user)
     owner_id == user.id
   end
@@ -43,6 +53,12 @@ class Form < ApplicationRecord
 
   def restore
     update(active: true)
+  end
+
+  # What the answers add up to. Nothing about it is stored: it is read only, and derived
+  # from submissions that cannot change once they are made.
+  def analysis
+    FormAnalysis.new(self)
   end
 
   def submissions_csv
