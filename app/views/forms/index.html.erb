@@ -1,0 +1,40 @@
+<% content_for :title, "Forms" %>
+
+<%= render "shared/page_header",
+      title: "Forms",
+      description: "Every form open to you. Each one can be filled out once." %>
+
+<% if @forms.any? %>
+  <ul class="space-y-4">
+    <% @forms.each do |form| %>
+      <li class="card p-5 sm:p-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="min-w-0">
+            <h2 class="text-base font-semibold text-slate-900">
+              <%= link_to form.name, form_path(form), class: "hover:text-indigo-600" %>
+            </h2>
+
+            <% if form.description.present? %>
+              <p class="mt-1 prose-muted"><%= form.description %></p>
+            <% end %>
+
+            <p class="mt-2 text-xs text-slate-500">From <%= form.owner.email %></p>
+          </div>
+
+          <div class="flex shrink-0 flex-wrap items-center gap-3">
+            <% if @submitted_form_ids.include?(form.id) %>
+              <span class="badge bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200">Completed</span>
+              <%= link_to "View your answers", form_submission_path(form), class: "btn btn-secondary" %>
+            <% else %>
+              <%= link_to "Fill out", new_form_submission_path(form), class: "btn btn-primary" %>
+            <% end %>
+          </div>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <%= render "shared/empty_state",
+        title: "No forms yet",
+        description: "When an administrator publishes a form it will show up here." %>
+<% end %>

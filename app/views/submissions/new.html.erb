@@ -1,0 +1,29 @@
+<% content_for :title, "Fill out #{@form.name}" %>
+
+<%= render "shared/page_header", title: @form.name, description: @form.description %>
+
+<div class="card p-5 sm:p-6">
+  <%= render "shared/error_messages", record: @submission %>
+
+  <%= form_with model: @submission, url: form_submission_path(@form) do |form| %>
+    <p class="mb-6 prose-muted">
+      Questions marked <%= required_answer_marker %> must be answered before you can submit.
+    </p>
+
+    <% if @form.fields.any? %>
+      <%= form.fields :values do |value_form| %>
+        <% @form.fields.each do |field| %>
+          <%= render "submissions/field_input",
+                value_form: value_form, field: field, submission: @submission %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <p class="mb-6 prose-muted">This form has no questions yet, so there is nothing to answer.</p>
+    <% end %>
+
+    <div class="mt-8 flex flex-wrap items-center gap-3">
+      <%= form.submit "Submit answers", class: "btn btn-primary" %>
+      <%= link_to "Cancel", form_path(@form), class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div>

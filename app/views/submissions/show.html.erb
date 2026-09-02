@@ -1,0 +1,31 @@
+<% content_for :title, "Your answers to #{@form.name}" %>
+
+<%= render layout: "shared/page_header",
+      locals: { title: @form.name,
+                description: "Your answers, submitted #{@submission.created_at.to_fs(:long)}." } do %>
+  <%= link_to "Back to forms", forms_path, class: "btn btn-secondary" %>
+<% end %>
+
+<% if @form.deleted? %>
+  <p class="mb-6 rounded-md bg-slate-100 px-4 py-3 text-sm text-slate-700 ring-1 ring-inset ring-slate-300">
+    This form has since been deleted. Your answers are kept.
+  </p>
+<% end %>
+
+<% if @form.fields.any? %>
+  <dl class="card divide-y divide-slate-200">
+    <% @form.fields.each do |field| %>
+      <div class="px-5 py-4">
+        <dt class="text-sm font-medium text-slate-900"><%= field.label %></dt>
+        <dd class="mt-1 text-sm text-slate-700">
+          <%= @submission.display_value_for(field).presence ||
+                tag.span("Not answered", class: "italic text-slate-400") %>
+        </dd>
+      </div>
+    <% end %>
+  </dl>
+<% else %>
+  <%= render "shared/empty_state",
+        title: "Nothing to show",
+        description: "This form had no questions when you submitted it." %>
+<% end %>

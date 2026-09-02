@@ -1,0 +1,62 @@
+<%# Renders the input for one field. input_type is an enum constrained to the ten Rails
+    form builder method names, so the public_send below dispatches against an allowlist
+    by construction. Locals: value_form, field, submission. %>
+<% answer = submission.values[field.id.to_s] %>
+<% errors = answer_errors_for(submission, field) %>
+<% control_class = errors.any? ? "form-control ring-red-400" : "form-control" %>
+
+<div class="mb-6">
+  <% if field.input_radio_button? || field.input_check_box? %>
+    <%# aria-required carries the requirement for the group as a whole, which the
+        required attribute on a single radio or check box cannot do. %>
+    <fieldset role="<%= field.input_radio_button? ? "radiogroup" : "group" %>"
+              aria-required="<%= field.required? %>"
+              aria-invalid="<%= errors.any? %>">
+      <legend class="form-label"><%= answer_label(field) %></legend>
+
+      <% if field.description.present? %>
+        <p class="form-hint"><%= field.description %></p>
+      <% end %>
+
+      <div class="mt-2 space-y-2">
+        <% if field.input_radio_button? %>
+          <%= value_form.collection_radio_buttons field.id, field.choices, :to_s, :to_s,
+                checked: answer do |choice| %>
+            <div class="flex items-center gap-2">
+              <%= choice.radio_button class: "form-check", required: field.required? %>
+              <%= choice.label class: "text-sm text-slate-700" %>
+            </div>
+          <% end %>
+        <% else %>
+          <%= value_form.collection_check_boxes field.id, field.choices, :to_s, :to_s,
+                checked: Array(answer) do |choice| %>
+            <div class="flex items-center gap-2">
+              <%= choice.check_box class: "form-check" %>
+              <%= choice.label class: "text-sm text-slate-700" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </fieldset>
+  <% else %>
+    <%= value_form.label field.id, answer_label(field), class: "form-label" %>
+
+    <% if field.description.present? %>
+      <p class="form-hint"><%= field.description %></p>
+    <% end %>
+
+    <% if field.input_select? %>
+      <%= value_form.select field.id, field.choices,
+            { include_blank: "Choose one", selected: answer },
+            { class: control_class, required: field.required?, "aria-invalid": errors.any? } %>
+    <% else %>
+      <%= value_form.public_send field.input_type, field.id,
+            value: answer, class: control_class,
+            required: field.required?, "aria-invalid": errors.any? %>
+    <% end %>
+  <% end %>
+
+  <% errors.each do |message| %>
+    <p class="mt-2 text-sm text-red-600"><%= message %></p>
+  <% end %>
+</div>

@@ -1,0 +1,42 @@
+<% content_for :title, @form.name %>
+
+<%= render layout: "shared/page_header", locals: { title: @form.name, description: @form.description } do %>
+  <% if @already_submitted %>
+    <%= link_to "View your answers", form_submission_path(@form), class: "btn btn-primary" %>
+  <% else %>
+    <%= link_to "Fill out this form", new_form_submission_path(@form), class: "btn btn-primary" %>
+  <% end %>
+<% end %>
+
+<p class="mb-6 prose-muted">From <%= @form.owner.email %></p>
+
+<% if @form.fields.any? %>
+  <div class="card divide-y divide-slate-200">
+    <h2 class="px-5 py-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <%= pluralize(@form.fields.size, "question") %>
+    </h2>
+
+    <% @form.fields.each do |field| %>
+      <div class="px-5 py-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <p class="text-sm font-medium text-slate-900"><%= field.label %></p>
+          <% if field.required? %>
+            <span class="badge badge-required">Required</span>
+          <% end %>
+        </div>
+
+        <% if field.description.present? %>
+          <p class="form-hint"><%= field.description %></p>
+        <% end %>
+
+        <% if field.choice_based? %>
+          <p class="mt-1 text-xs text-slate-500">Choices: <%= field.choices.to_sentence %></p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <%= render "shared/empty_state",
+        title: "No questions yet",
+        description: "This form has not been given any questions." %>
+<% end %>
