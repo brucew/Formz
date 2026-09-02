@@ -124,6 +124,79 @@ too.
   field id, and is unique per user per form — that uniqueness is enforced by a database index,
   not only by a validation.
 
+## Ran Out Of Time
+
+Two things that were asked for and are not here. Both are scoping decisions recorded as
+assumptions in [docs/implementation-plan.md](docs/implementation-plan.md).
+
+### Custom input types
+
+`Field#input_type` is an enum whose keys are Rails form builder method names, and
+`app/views/submissions/_field_input.html.erb` renders a field with
+`value_form.public_send field.input_type, field.id, ...`. The enum constrains the column to
+its own keys, so that dispatch is an allowlist by construction.
+
+For an input type that renders through a form builder method, adding one is a key in the
+enum in `app/models/field.rb` and a row in the table above.
+`FieldsHelper#field_input_type_options` builds the editor's dropdown from
+`Field.input_types`, so the new type shows up in the field editor with no view change — add
+a case to `field_input_type_label` only if `humanize` gets the label wrong, as it does for
+`url_field`.
+
+This extends to your own helpers. `app/views/submissions/new.html.erb` uses the default
+`form_with` builder; hand it a `builder:` that subclasses `ActionView::Helpers::FormBuilder`
+and any method on that subclass is reachable by the same `public_send`. A bespoke control is
+an enum key plus a method.
+
+Two parts are not free:
+
+- **Value type.** `FieldTypeCompatibilityValidator` maps `number_field` to `number`,
+  `date_field` to `date`, and everything else to `string`. A type that stores a number or a
+  date needs a branch there. A type storing something none of the three value types covers
+  needs a new `value_type` key and a matching branch in `Field#cast`.
+- **Choices.** `Field#choice_based?` names `select`, `radio_button` and `check_box`
+  explicitly, and `FieldChoicesValidator` rejects choices on anything else, so a type that
+  offers a set of options has to be added there. The editor's choices textarea then follows
+  for free, because `field_type_controller.js` is handed
+  `FieldsHelper#choice_based_input_types`. The rendering does not: the three existing
+  choice-based types skip `public_send` entirely and have their own branches in
+  `_field_input`, going through `select`, `collection_radio_buttons` and
+  `collection_check_boxes`. A type that collects more than one answer also needs adding to
+  `Field#multiple_choice?`, which is what makes `cast` return an array, and to
+  `permitted_value_keys` in `app/controllers/submissions_controller.rb`, which is what
+  permits an array parameter rather than a scalar.
+
+**File upload is the exception to "cheap".** The dispatch is genuinely trivial — `file_field`
+is a form builder method like any other — but an answer lives in the `values` JSONB column on
+`submissions`, keyed by field id, holding what `Field#cast` produces: a string, a number, a
+date, or an array of choices. Bytes are not one of those. File upload needs Active Storage —
+`bin/rails active_storage:install` has never been run here, there are no `active_storage_*`
+tables in `db/schema.rb` — and somewhere to hang the attachment other than the `values` hash,
+most likely a record per uploaded answer joined to a submission and a field. `Field#cast`,
+`SubmissionValuesValidator`, `Submission#display_value_for` and the CSV export each then need
+to know what a file answer is. Trivial to dispatch to; not trivial to store.
+
+### Draft and publish
+
+There is no draft state and no publish step. A form is visible to every member the moment it
+is created: `FormsController#index` lists `Form.active`, `active` defaults to true, and
+nothing else gates visibility. That includes a form with no questions yet, which appears in
+**All forms** with a **Fill out** button and renders a submit button under "This form has no
+questions yet".
+
+That empty case collides with the structure lock. Submitting an empty form succeeds and
+stores an empty `values` hash, which makes `Form#locked?` true, which means the questions can
+never be added — the form is finished before it was written.
+
+Soft delete is the only mechanism that currently takes a form out of circulation, and it is
+not a stand-in for a draft state: a deleted form refuses every edit except its own `active`
+flag, so it cannot be used to hide a form while it is being built. `Form#restore` exists on
+the model, but no route or controller calls it, so the way back is the console.
+
+The fix is a `published` boolean on `forms`, the member-facing queries in
+`FormsController` and `SubmissionsController` checking it alongside `active`, and a publish
+action in the admin editor.
+
 ## Tests
 
 ```bash
