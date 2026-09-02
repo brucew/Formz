@@ -115,6 +115,39 @@ and one column per question. **Download CSV** gives you the same data as a file,
 `Submitted by` and `Submitted at` ahead of the question columns. Both work for deleted forms
 too.
 
+### Analysing the answers
+
+**Analysis**, on a form you own, summarises what the answers add up to. It opens with the
+submission count, the period they were collected over, the share of possible answers actually
+given, and how many people left nothing blank.
+
+Below that, every question gets a card that always states how many people answered it and how
+many left it blank, then summarises the answers in the way that question's type allows:
+
+| Question type | What you get |
+|---|---|
+| Select, radio button, check box | A bar per option with counts and shares, including options nobody picked |
+| Number field | Smallest, largest, mean, and median |
+| Date field | Earliest, latest, the range in days, and a timeline of when answers landed |
+| Text field, text area | How many wrote something, how many distinct answers, and a sample of them |
+
+A few details worth knowing before you read too much into a number:
+
+- **Shares are of the people who answered that question**, not of everyone who submitted the
+  form. Each card says so.
+- **Check-box shares can add up to more than 100%**, because one person can pick several
+  options. The card says how many options were picked in total.
+- **A question with four or fewer answers is flagged**, and number questions then list every
+  answer instead of averaging them. With three responses the list is the analysis.
+- **Options nobody picked still appear**, at zero. A choice nobody made is a result.
+- **Answers that are no longer valid choices** — because the question's options were changed
+  before anyone answered, or the data was written directly — are counted and listed under
+  their own heading rather than quietly dropped.
+- Free text is **not** summarised into sentiment, keyword counts, or a word cloud. You get
+  counts and a sample, with the submissions table for the rest.
+
+Deleted forms can still be analysed, on the same reasoning that they can still be exported.
+
 ## How it fits together
 
 - A **Form** belongs to the administrator who owns it and has many **Fields**.
