@@ -15,12 +15,9 @@ module SubmissionsHelper
     safe_join([ field.label, required_answer_marker ])
   end
 
-  # SubmissionValuesValidator attaches every message to :values, prefixed with the
-  # field's label. Matching that prefix is what lets the fill out form put a message
-  # under the input that caused it as well as in the summary at the top.
+  # SubmissionValuesValidator tags each answer error with the field it came from, so a
+  # message lands under the input that caused it as well as in the summary at the top.
   def answer_errors_for(submission, field)
-    submission.errors.where(:values).map(&:message).select do |message|
-      message.start_with?("#{field.label} ")
-    end
+    submission.errors.where(:base).select { |error| error.options[:field_id] == field.id }.map(&:message)
   end
 end

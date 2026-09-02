@@ -24,7 +24,7 @@ class SubmissionTest < ActiveSupport::TestCase
     submission = build_survey_submission(values: {})
 
     assert_not submission.valid?
-    assert_includes submission.errors[:values], "Full name is required"
+    assert_includes submission.errors[:base], "Full name is required"
   end
 
   test "a required multiple choice field is not answered by an empty array" do
@@ -32,28 +32,37 @@ class SubmissionTest < ActiveSupport::TestCase
     submission = build_survey_submission(answers(perks: [ "" ]))
 
     assert_not submission.valid?
-    assert_includes submission.errors[:values], "Perks used is required"
+    assert_includes submission.errors[:base], "Perks used is required"
   end
 
   test "an answer that will not cast is rejected" do
     submission = build_survey_submission(answers(years_experience: "seven"))
 
     assert_not submission.valid?
-    assert_includes submission.errors[:values], "Years of experience must be a valid number"
+    assert_includes submission.errors[:base], "Years of experience must be a valid number"
+  end
+
+  test "answer errors carry the field they came from" do
+    submission = build_survey_submission(answers(years_experience: "seven"))
+    submission.validate
+
+    error = submission.errors.where(:base).find { |candidate| candidate.options[:field_id] == fields(:years_experience).id }
+
+    assert_equal "Years of experience must be a valid number", error.message
   end
 
   test "an answer outside a field's choices is rejected" do
     submission = build_survey_submission(answers(team: "Marketing"))
 
     assert_not submission.valid?
-    assert_includes submission.errors[:values], "Team has an answer that is not one of its choices"
+    assert_includes submission.errors[:base], "Team has an answer that is not one of its choices"
   end
 
   test "answers for fields that are not on the form are rejected" do
     submission = build_survey_submission(answers.merge("0" => "stray"))
 
     assert_not submission.valid?
-    assert_includes submission.errors[:values], "includes answers for fields that are not on this form"
+    assert_includes submission.errors[:base], "Some answers are for fields that are not on this form"
   end
 
   test "stores answers cast to their value type" do

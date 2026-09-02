@@ -6,7 +6,10 @@ class Form < ApplicationRecord
   has_many :fields, -> { order(:position) }, dependent: :destroy, inverse_of: :form
   has_many :submissions, dependent: :destroy, inverse_of: :form
 
-  accepts_nested_attributes_for :fields, allow_destroy: true, reject_if: :all_blank
+  # A new row with no label is an untouched row in the editor. :all_blank cannot see
+  # that, because the type selects and the required checkbox always submit a value.
+  accepts_nested_attributes_for :fields, allow_destroy: true,
+                                reject_if: ->(attributes) { attributes["id"].blank? && attributes["label"].blank? }
 
   scope :active, -> { where(active: true) }
 
