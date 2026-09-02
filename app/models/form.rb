@@ -29,6 +29,10 @@ class Form < ApplicationRecord
     active?
   end
 
+  def owned_by?(user)
+    owner_id == user.id
+  end
+
   def deleted?
     !active?
   end

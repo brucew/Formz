@@ -18,10 +18,20 @@
               <p class="mt-1 prose-muted"><%= form.description %></p>
             <% end %>
 
-            <p class="mt-2 text-xs text-slate-500">From <%= form.owner.email %></p>
+            <p class="mt-2 text-xs text-slate-500">
+              <% if form.owned_by?(current_user) %>
+                Yours
+              <% else %>
+                From <%= form.owner.email %>
+              <% end %>
+            </p>
           </div>
 
           <div class="flex shrink-0 flex-wrap items-center gap-3">
+            <% if current_user.admin? && form.owned_by?(current_user) %>
+              <%= link_to "Manage", admin_form_path(form), class: "btn btn-secondary" %>
+            <% end %>
+
             <% if @submitted_form_ids.include?(form.id) %>
               <span class="badge bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200">Completed</span>
               <%= link_to "View your answers", form_submission_path(form), class: "btn btn-secondary" %>
@@ -33,6 +43,13 @@
       </li>
     <% end %>
   </ul>
+<% elsif current_user.admin? %>
+  <%= render layout: "shared/empty_state",
+        locals: { title: "No forms yet",
+                  description: "Nothing has been published yet. Build the first one." } do %>
+    <%= link_to "My forms", admin_forms_path, class: "btn btn-secondary" %>
+    <%= link_to "New form", new_admin_form_path, class: "btn btn-primary" %>
+  <% end %>
 <% else %>
   <%= render "shared/empty_state",
         title: "No forms yet",

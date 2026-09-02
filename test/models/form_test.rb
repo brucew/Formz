@@ -18,6 +18,12 @@ class FormTest < ActiveSupport::TestCase
     assert_not_includes Form.active, forms(:deleted_form)
   end
 
+  test "knows which admin owns it" do
+    assert forms(:survey).owned_by?(users(:admin))
+    assert_not forms(:survey).owned_by?(users(:other_admin))
+    assert_not forms(:survey).owned_by?(users(:member))
+  end
+
   test "is locked once it has a submission" do
     assert forms(:locked_form).locked?
     assert_not forms(:survey).locked?

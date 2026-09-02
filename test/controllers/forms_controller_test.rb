@@ -80,4 +80,26 @@ class FormsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
   end
+
+  test "an admin can reach the management page for a form they own" do
+    sign_in_as users(:admin)
+    get forms_path
+
+    assert_select "a[href=?]", admin_form_path(forms(:survey)), text: "Manage"
+    assert_select "a[href=?]", admin_form_path(forms(:other_admins_form)), count: 0
+  end
+
+  test "a member is offered no management link" do
+    sign_in_as users(:member)
+    get forms_path
+
+    assert_select "a", text: "Manage", count: 0
+  end
+
+  test "the list says which forms belong to the admin reading it" do
+    sign_in_as users(:admin)
+    get forms_path
+
+    assert_select "li", text: /Yours/
+  end
 end

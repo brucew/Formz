@@ -26,6 +26,19 @@ class LayoutTest < ActionDispatch::IntegrationTest
     assert_select "nav a[href=?]", admin_forms_path
   end
 
+  test "the navigation marks the section being viewed" do
+    sign_in_as users(:admin)
+
+    get forms_path
+
+    assert_select "nav a[href=?][aria-current=page]", forms_path
+    assert_select "nav a[href=?][aria-current=page]", admin_forms_path, count: 0
+
+    get admin_forms_path
+
+    assert_select "nav a[href=?][aria-current=page]", admin_forms_path
+  end
+
   test "the page header renders its title without leaking template text" do
     sign_in_as users(:member)
     get forms_path
