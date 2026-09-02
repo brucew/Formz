@@ -1,0 +1,26 @@
+<% content_for :title, "Choose a new password" %>
+
+<%= render layout: "devise/shared/auth_card",
+           locals: { title: "Choose a new password", description: "This link signs you in once you have set the new password." } do %>
+  <%= form_with model: resource, as: resource_name, url: password_path(resource_name), method: :put, class: "space-y-6" do |form| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+    <%= form.hidden_field :reset_password_token %>
+
+    <div>
+      <%= form.label :password, "New password", class: "form-label" %>
+      <%= form.password_field :password, autofocus: true, autocomplete: "new-password", required: true, class: "form-control" %>
+      <% if @minimum_password_length %>
+        <p class="form-hint"><%= @minimum_password_length %> characters minimum.</p>
+      <% end %>
+    </div>
+
+    <div>
+      <%= form.label :password_confirmation, "Confirm new password", class: "form-label" %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password", required: true, class: "form-control" %>
+    </div>
+
+    <%= form.submit "Save new password", class: "btn btn-primary w-full" %>
+  <% end %>
+
+  <%= render "devise/shared/links" %>
+<% end %>

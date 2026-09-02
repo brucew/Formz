@@ -1,0 +1,27 @@
+<% content_for :title, "Sign in" %>
+
+<%= render layout: "devise/shared/auth_card",
+           locals: { title: "Sign in", description: "Welcome back. Sign in to fill out and manage forms." } do %>
+  <%= form_with model: resource, as: resource_name, url: session_path(resource_name), class: "space-y-6" do |form| %>
+    <div>
+      <%= form.label :email, "Email address", class: "form-label" %>
+      <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true, class: "form-control" %>
+    </div>
+
+    <div>
+      <%= form.label :password, class: "form-label" %>
+      <%= form.password_field :password, autocomplete: "current-password", required: true, class: "form-control" %>
+    </div>
+
+    <% if devise_mapping.rememberable? %>
+      <div class="flex items-center gap-2">
+        <%= form.check_box :remember_me, class: "form-check" %>
+        <%= form.label :remember_me, "Stay signed in", class: "text-sm font-medium text-slate-700" %>
+      </div>
+    <% end %>
+
+    <%= form.submit "Sign in", class: "btn btn-primary w-full" %>
+  <% end %>
+
+  <%= render "devise/shared/links" %>
+<% end %>

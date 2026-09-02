@@ -1,0 +1,16 @@
+<%# The centered shell every Devise screen sits in. Signed-out visitors never see the
+    application header, so those pages carry the Formz wordmark themselves. %>
+<div class="mx-auto w-full max-w-md">
+  <% unless user_signed_in? %>
+    <p class="text-center text-2xl font-semibold tracking-tight text-slate-900">Formz</p>
+  <% end %>
+
+  <div class="card mt-6 px-6 py-8 sm:px-8">
+    <h1 class="page-title"><%= title %></h1>
+    <% if local_assigns[:description].present? %>
+      <p class="mt-2 prose-muted"><%= description %></p>
+    <% end %>
+
+    <div class="mt-8"><%= yield %></div>
+  </div>
+</div>
